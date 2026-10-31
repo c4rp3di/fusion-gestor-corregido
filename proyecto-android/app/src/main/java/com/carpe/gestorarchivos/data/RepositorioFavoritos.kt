@@ -13,6 +13,15 @@ class RepositorioFavoritos(context: Context) {
 
     private val prefs = context.applicationContext.getSharedPreferences("gestor_prefs", Context.MODE_PRIVATE)
 
+    private val prefsUso = context.applicationContext.getSharedPreferences("gestor_favoritos_uso", Context.MODE_PRIVATE)
+
+    /** Marca el favorito como abierto ahora (para ordenar la lista del atajo por uso reciente). */
+    fun registrarUso(ruta: String) {
+        prefsUso.edit().putLong(ruta, System.currentTimeMillis()).apply()
+    }
+
+    fun ultimoUso(ruta: String): Long = prefsUso.getLong(ruta, 0L)
+
     data class Favorito(val ruta: String, val nombre: String, val esCarpeta: Boolean) {
         val archivo: File get() = File(ruta)
         val existe: Boolean get() = archivo.exists()
@@ -52,6 +61,7 @@ class RepositorioFavoritos(context: Context) {
     fun agregar(f: File): Boolean = agregar(f.absolutePath, f.name.ifEmpty { f.absolutePath }, f.isDirectory)
 
     fun quitar(ruta: String) {
+        prefsUso.edit().remove(ruta).apply()
         guardar(listar().filterNot { it.ruta == ruta })
     }
 
