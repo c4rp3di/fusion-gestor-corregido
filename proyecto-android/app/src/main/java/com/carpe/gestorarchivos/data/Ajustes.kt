@@ -21,6 +21,11 @@ class Ajustes(context: Context) {
         get() = prefs.getBoolean("numeros_linea", false)
         set(v) { prefs.edit().putBoolean("numeros_linea", v).apply() }
 
+    /** ¿Ya se le explicó al usuario el permiso «Mostrar sobre otras apps»? */
+    var preguntadoSuperposicion: Boolean
+        get() = prefs.getBoolean("preguntado_superposicion", false)
+        set(v) { prefs.edit().putBoolean("preguntado_superposicion", v).apply() }
+
     /** Última carpeta donde se guardó algo recibido de otra app. */
     var ultimaCarpetaGuardado: String?
         get() = prefs.getString("ultima_carpeta_guardado", null)
