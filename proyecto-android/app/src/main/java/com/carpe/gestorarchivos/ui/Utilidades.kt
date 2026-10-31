@@ -20,7 +20,7 @@ fun Fragment.toast(mensaje: String, largo: Boolean = false) {
 fun Fragment.avisoConDeshacer(mensaje: String, alDeshacer: () -> Unit) {
     val v = view ?: return
     Snackbar.make(v, mensaje, Snackbar.LENGTH_LONG)
-        .setDuration(3000)
+        .setDuration(8000)
         .setAction("DESHACER") { alDeshacer() }
         .show()
 }
