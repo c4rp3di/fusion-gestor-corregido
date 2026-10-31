@@ -46,10 +46,16 @@ object AvisoDescarga {
     fun terminado(f: File) { pendientes.remove(f.absolutePath) }
 
     private var barraActual: View? = null
+    private var ultimoAviso: String? = null
+    private var ultimoAvisoMs = 0L
 
     fun notificar(ctx: Context, f: File) {
         if (!f.isFile || f.length() == 0L) return
         val app = ctx.applicationContext
+        val ahora = System.currentTimeMillis()
+        if (f.absolutePath == ultimoAviso && ahora - ultimoAvisoMs < 3000) return // cierres repetidos del mismo archivo
+        ultimoAviso = f.absolutePath
+        ultimoAvisoMs = ahora
         // Con permiso «Mostrar sobre otras apps»: barra inferior con «Abrir» (como la de «Descargando…»)
         if (Settings.canDrawOverlays(app)) {
             Handler(Looper.getMainLooper()).post {
@@ -95,6 +101,13 @@ object AvisoDescarga {
                     try { ctx.startActivity(abrirIntent(ctx, f)) } catch (_: Exception) { }
                 }
             }
+            val cerrar = TextView(ctx).apply {
+                text = "✕"
+                setTextColor(0xFFBBBBBB.toInt())
+                textSize = 16f
+                setPadding(dp(12), dp(12), dp(8), dp(12))
+                setOnClickListener { quitarBarra(ctx) }
+            }
             val barra = LinearLayout(ctx).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.CENTER_VERTICAL
@@ -102,6 +115,7 @@ object AvisoDescarga {
                 setPadding(dp(16), dp(4), dp(8), dp(4))
                 addView(texto, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
                 addView(abrir)
+                addView(cerrar)
             }
             val tipo = if (Build.VERSION.SDK_INT >= 26) WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else @Suppress("DEPRECATION") WindowManager.LayoutParams.TYPE_PHONE
@@ -121,7 +135,7 @@ object AvisoDescarga {
             barraActual = barra
             Handler(Looper.getMainLooper()).postDelayed({
                 if (barraActual === barra) quitarBarra(ctx)
-            }, 8000)
+            }, 15000)
             true
         } catch (_: Exception) {
             false
