@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.carpe.gestorarchivos.R
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -13,6 +14,15 @@ import kotlinx.coroutines.withContext
 fun Fragment.toast(mensaje: String, largo: Boolean = false) {
     val ctx = context ?: return
     Toast.makeText(ctx, mensaje, if (largo) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
+}
+
+/** Barra inferior con «DESHACER» durante unos segundos. */
+fun Fragment.avisoConDeshacer(mensaje: String, alDeshacer: () -> Unit) {
+    val v = view ?: return
+    Snackbar.make(v, mensaje, Snackbar.LENGTH_LONG)
+        .setDuration(3000)
+        .setAction("DESHACER") { alDeshacer() }
+        .show()
 }
 
 fun Fragment.navegarA(destino: Fragment, etiqueta: String) {
