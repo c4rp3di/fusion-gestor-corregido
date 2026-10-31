@@ -52,6 +52,7 @@ object AvisoDescarga {
     fun notificar(ctx: Context, f: File) {
         if (!f.isFile || f.length() == 0L) return
         val app = ctx.applicationContext
+        Atajos.ultimaDescarga(app, f)
         val ahora = System.currentTimeMillis()
         if (f.absolutePath == ultimoAviso && ahora - ultimoAvisoMs < 3000) return // cierres repetidos del mismo archivo
         ultimoAviso = f.absolutePath
