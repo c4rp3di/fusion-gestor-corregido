@@ -52,9 +52,34 @@ class ActividadExterna : AppCompatActivity(), AnfitrionExterno {
             cancelar()
             return
         }
+        proponerBarraInferior()
         lifecycleScope.launch(Dispatchers.IO) { ResolvedorUri.purgarCache(applicationContext) }
         PermisoArchivosUi.pedirSiHaceFalta(this, permisosLegacy)
         interpretar(intent)
+    }
+
+    /** Una sola vez: ofrece activar la barra «Guardado · ABRIR» (necesita «Mostrar sobre otras apps»). */
+    private fun proponerBarraInferior() {
+        val ajustes = Ajustes(this)
+        val guarda = intent.action == Intent.ACTION_CREATE_DOCUMENT
+        if (!guarda || ajustes.preguntadoSuperposicion || android.provider.Settings.canDrawOverlays(this)) return
+        ajustes.preguntadoSuperposicion = true
+        AlertDialog.Builder(this)
+            .setTitle("Aviso al terminar de guardar")
+            .setMessage(
+                "Para mostrar una barra «Guardado · ABRIR» en la parte inferior al terminar una descarga, " +
+                    "activa «Permitir sobre otras apps» para esta app.\n\nSin ello recibirás una notificación."
+            )
+            .setPositiveButton("Activar") { _, _ ->
+                startActivity(
+                    Intent(
+                        android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:$packageName")
+                    )
+                )
+            }
+            .setNegativeButton("Ahora no", null)
+            .show()
     }
 
     // ------------------------------------------------------------------ AnfitrionExterno
