@@ -55,3 +55,6 @@ Este código no se pudo compilar en el entorno donde se escribió (sin SDK de An
 - Con el permiso «Mostrar sobre otras apps» el aviso es una barra oscura en la parte baja (8 s) con el botón ABRIR, sobre la app desde la que descargas. Sin el permiso se usa la notificación.
 - La primera vez que se usa «Guardar como…» se explica el permiso y se ofrece activarlo (no vuelve a preguntar).
 - Nuevo permiso en el manifest: `SYSTEM_ALERT_WINDOW`.
+
+## Corrección (v3e)
+- Al abrir un archivo desde la barra/notificación «Guardado · ABRIR» (o «Abrir con…»), la pantalla se mostraba en modo externo y ocultaba la barra de selección y los menús contextuales (⋮, copiar, mover, borrar…). Ahora el modo «Abrir» se comporta como el gestor normal; solo no pisa la última carpeta ni el orden de la app.
