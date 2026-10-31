@@ -68,3 +68,10 @@ Este código no se pudo compilar en el entorno donde se escribió (sin SDK de An
 ## Atajo «Favoritos» (v3g)
 - Nuevo atajo en la pulsación larga del icono. Al pulsarlo aparece la lista de favoritos como ventana flotante (sin abrir el gestor completo); al elegir uno se abre (carpeta en el gestor, archivo en su visor/navegador). Tocar fuera la cierra. Si no hay favoritos, avisa con un mensaje.
 - Nuevos: `ActividadFavoritos.kt`, `res/drawable/ic_atajo_favorito.xml`, estilo `Theme.MiApp.Transparente`. Modificados: `AndroidManifest.xml`, `data/Atajos.kt`, `res/values/themes.xml`.
+
+## Lista de favoritos del atajo, rediseñada (v3h)
+- Ahora es una hoja inferior (esquinas redondeadas, barra para agarrar) en lugar de un diálogo centrado.
+- Icono vectorial por tipo (carpeta, código/HTML, texto, imagen, vídeo, audio, comprimido) y segunda línea con la carpeta donde está cada favorito (o «Almacenamiento interno» si está en la raíz).
+- Carpetas primero, separador «Archivos» y después los archivos.
+- Orden por uso reciente dentro de cada grupo: lo último que abres desde esta lista sube arriba; lo que nunca se abrió conserva su orden.
+- Nuevos: `res/drawable/ic_fav_*.xml` (7). Modificados: `ActividadFavoritos.kt` (reescrita), `data/RepositorioFavoritos.kt` (`registrarUso`, `ultimoUso`).
