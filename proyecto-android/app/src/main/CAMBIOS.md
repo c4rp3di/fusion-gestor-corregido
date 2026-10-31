@@ -64,3 +64,7 @@ Este código no se pudo compilar en el entorno donde se escribió (sin SDK de An
 - **Atajos del icono** (pulsación larga): «Última descarga» (se actualiza al guardar algo desde otra app), «Descargas» y «Recientes».
 - Nuevos: `data/Atajos.kt`, `res/drawable/ic_atajo_carpeta.xml`, `ic_atajo_reciente.xml`, `ic_atajo_archivo.xml`.
 - Modificados: `data/Papelera.kt` (`enviarConEntrada`), `ui/Utilidades.kt` (`avisoConDeshacer`), `ui/PantallaGestor.kt`, `MainActivity.kt`, `data/AvisoDescarga.kt`.
+
+## Atajo «Favoritos» (v3g)
+- Nuevo atajo en la pulsación larga del icono. Al pulsarlo aparece la lista de favoritos como ventana flotante (sin abrir el gestor completo); al elegir uno se abre (carpeta en el gestor, archivo en su visor/navegador). Tocar fuera la cierra. Si no hay favoritos, avisa con un mensaje.
+- Nuevos: `ActividadFavoritos.kt`, `res/drawable/ic_atajo_favorito.xml`, estilo `Theme.MiApp.Transparente`. Modificados: `AndroidManifest.xml`, `data/Atajos.kt`, `res/values/themes.xml`.
