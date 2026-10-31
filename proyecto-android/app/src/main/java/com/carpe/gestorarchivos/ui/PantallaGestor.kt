@@ -1274,27 +1274,53 @@ class PantallaGestor : Fragment() {
             { dlg ->
                 var ok = 0
                 var fallos = 0
+                val movidos = ArrayList<Pair<File, File>>() // (origen, nueva ubicación) para poder deshacer
                 for (f in archivos) {
                     dlg.actualizar(f.name)
                     val exito = if (modo == PortapapelesInterno.Modo.MOVER) {
                         val nuevo = GestorArchivos.moverA(f, destino)
                         if (nuevo != null && nuevo.absolutePath != f.absolutePath) {
                             repositorioFavoritos.actualizarRuta(f.absolutePath, nuevo.absolutePath)
+                            movidos.add(f to nuevo)
                         }
                         nuevo != null
                     } else GestorArchivos.copiar(f, destino)
                     if (exito) ok++ else fallos++
                 }
-                Pair(ok, fallos)
+                Triple(ok, fallos, movidos)
             }
         ) { r ->
-            val (ok, fallos) = r.getOrDefault(Pair(0, archivos.size))
-            toast(
-                "$ok elemento(s) pegado(s)" + if (fallos > 0) ", $fallos error(es) (no se puede pegar una carpeta dentro de sí misma)" else "",
-                fallos > 0
-            )
+            val (ok, fallos, movidos) = r.getOrDefault(Triple(0, archivos.size, ArrayList<Pair<File, File>>()))
+            val mensaje = "$ok elemento(s) pegado(s)" +
+                if (fallos > 0) ", $fallos error(es) (no se puede pegar una carpeta dentro de sí misma)" else ""
+            if (movidos.isNotEmpty() && fallos == 0) avisoConDeshacer(mensaje) { deshacerMovimiento(movidos) }
+            else toast(mensaje, fallos > 0)
             PortapapelesInterno.vaciar()
             actualizarEstadoFabPegar()
+            ResumenCarpetas.invalidar()
+            refrescar()
+        }
+    }
+
+    /** Devuelve cada elemento movido a su carpeta de origen (con otro nombre si allí ya existe uno igual). */
+    private fun deshacerMovimiento(movidos: List<Pair<File, File>>) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val fallos = withContext(Dispatchers.IO) {
+                var n = 0
+                for ((origen, actual) in movidos.asReversed()) {
+                    val padre = origen.parentFile
+                    if (padre == null || !actual.exists() || !(padre.exists() || padre.mkdirs())) {
+                        n++
+                        continue
+                    }
+                    val destino = GestorArchivos.nombreLibre(padre, origen.name)
+                    if (GestorArchivos.moverComo(actual, destino)) {
+                        repositorioFavoritos.actualizarRuta(actual.absolutePath, destino.absolutePath)
+                    } else n++
+                }
+                n
+            }
+            toast(if (fallos == 0) "Movimiento deshecho" else "No se pudo deshacer ($fallos)", fallos > 0)
             ResumenCarpetas.invalidar()
             refrescar()
         }
@@ -1341,21 +1367,35 @@ class PantallaGestor : Fragment() {
             { dlg ->
                 var ok = 0
                 var fallos = 0
+                val entradas = ArrayList<Papelera.Entrada>() // para poder deshacer
                 for (item in items) {
                     dlg.actualizar(item.nombre)
-                    val r = if (aPapelera) papelera.enviar(item.archivo) else GestorArchivos.borrarDefinitivo(item.archivo)
+                    val r = when {
+                        !aPapelera -> GestorArchivos.borrarDefinitivo(item.archivo)
+                        Papelera.esRutaPapelera(item.archivo) -> papelera.enviar(item.archivo)
+                        else -> papelera.enviarConEntrada(item.archivo)?.also { entradas.add(it) } != null
+                    }
                     if (r) ok++ else fallos++
                 }
-                Pair(ok, fallos)
+                Triple(ok, fallos, entradas)
             }
         ) { r ->
-            val (ok, fallos) = r.getOrDefault(Pair(0, items.size))
-            toast(
-                (if (aPapelera) "$ok movido(s) a la papelera" else "$ok borrado(s)") +
-                    if (fallos > 0) ", $fallos error(es)" else "",
-                fallos > 0
-            )
+            val (ok, fallos, entradas) = r.getOrDefault(Triple(0, items.size, ArrayList<Papelera.Entrada>()))
+            val mensaje = (if (aPapelera) "$ok movido(s) a la papelera" else "$ok borrado(s)") +
+                if (fallos > 0) ", $fallos error(es)" else ""
+            if (aPapelera && entradas.isNotEmpty()) avisoConDeshacer(mensaje) { deshacerBorrado(entradas) }
+            else toast(mensaje, fallos > 0)
             adaptador.limpiarSeleccion()
+            ResumenCarpetas.invalidar()
+            refrescar()
+        }
+    }
+
+    /** Saca de la papelera lo que se acaba de borrar y lo devuelve a su sitio. */
+    private fun deshacerBorrado(entradas: List<Papelera.Entrada>) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val fallos = withContext(Dispatchers.IO) { entradas.count { !papelera.restaurar(it) } }
+            toast(if (fallos == 0) "Restaurado" else "No se pudo restaurar ($fallos)", fallos > 0)
             ResumenCarpetas.invalidar()
             refrescar()
         }
