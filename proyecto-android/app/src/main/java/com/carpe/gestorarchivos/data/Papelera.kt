@@ -63,18 +63,26 @@ class Papelera(context: Context) {
     /** Mueve a la papelera. Si el archivo ya está dentro de ella, lo borra definitivamente. */
     fun enviar(archivo: File): Boolean {
         if (esRutaPapelera(archivo)) return GestorArchivos.borrarDefinitivo(archivo)
+        return enviarConEntrada(archivo) != null
+    }
+
+    /** Mueve a la papelera y devuelve la entrada creada (para poder deshacer), o null si falló. */
+    fun enviarConEntrada(archivo: File): Entrada? {
         val dir = carpetaPapeleraDe(archivo)
-        if (!dir.exists() && !dir.mkdirs()) return false
+        if (!dir.exists() && !dir.mkdirs()) return null
         val id = "${System.currentTimeMillis()}-${UUID.randomUUID().toString().take(8)}"
         val destino = File(dir, id)
         val esCarpeta = archivo.isDirectory
-        if (!GestorArchivos.moverComo(archivo, destino)) return false
+        val original = archivo.absolutePath
+        val nombre = archivo.name
+        if (!GestorArchivos.moverComo(archivo, destino)) return null
+        val entrada = Entrada(id, original, nombre, System.currentTimeMillis(), esCarpeta, destino.absolutePath)
         synchronized(lock) {
             val lista = leer()
-            lista.add(Entrada(id, archivo.absolutePath, archivo.name, System.currentTimeMillis(), esCarpeta, destino.absolutePath))
+            lista.add(entrada)
             guardar(lista)
         }
-        return true
+        return entrada
     }
 
     /** Entradas que siguen existiendo, de la más reciente a la más antigua. */
