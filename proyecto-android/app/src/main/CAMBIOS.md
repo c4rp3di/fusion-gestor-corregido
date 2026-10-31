@@ -50,3 +50,8 @@ Este código no se pudo compilar en el entorno donde se escribió (sin SDK de An
 - En «Guardar como…» el aviso salta cuando la otra app cierra el archivo (no antes de que termine de escribir).
 - Android 13+: la app pide permiso de notificaciones la primera vez que se usa «Guardar como…» o «Compartir con…».
 - Nuevo: `data/AvisoDescarga.kt`. Modificados: `ProveedorDocumentos.kt`, `PantallaGestor.kt`, `ActividadExterna.kt`, `AndroidManifest.xml`.
+
+## Barra inferior «Guardado · ABRIR»
+- Con el permiso «Mostrar sobre otras apps» el aviso es una barra oscura en la parte baja (8 s) con el botón ABRIR, sobre la app desde la que descargas. Sin el permiso se usa la notificación.
+- La primera vez que se usa «Guardar como…» se explica el permiso y se ofrece activarlo (no vuelve a preguntar).
+- Nuevo permiso en el manifest: `SYSTEM_ALERT_WINDOW`.
