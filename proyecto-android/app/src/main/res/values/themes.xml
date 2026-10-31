@@ -4,4 +4,11 @@
         <item name="colorPrimaryDark">@color/primario_oscuro</item>
         <item name="colorAccent">@color/acento</item>
     </style>
+    <style name="Theme.MiApp.Transparente">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 </resources>
