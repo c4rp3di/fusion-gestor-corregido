@@ -4,10 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.carpe.gestorarchivos.data.Atajos
 import com.carpe.gestorarchivos.data.Permisos
 import com.carpe.gestorarchivos.data.ProveedorDocumentos
 import com.carpe.gestorarchivos.data.ResolvedorUri
 import com.carpe.gestorarchivos.ui.PermisoArchivosUi
+import com.carpe.gestorarchivos.ui.PantallaBusqueda
 import com.carpe.gestorarchivos.ui.PantallaGestor
 import java.io.File
 
@@ -25,13 +27,27 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.contenedorPantallas, crearPantalla(rutaDesdeIntent(intent)))
                 .commit()
             pedirPermisoArchivosSiHaceFalta()
+            if (intent.getBooleanExtra(Atajos.EXTRA_RECIENTES, false)) abrirRecientes()
         }
+        Atajos.registrarBase(this)
+    }
+
+    /** Atajo del icono «Recientes»: abre la lista de recientes encima de la pantalla actual. */
+    private fun abrirRecientes() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.contenedorPantallas, PantallaBusqueda.nueva(false))
+            .addToBackStack("recientes")
+            .commit()
     }
 
     // La app ya estaba abierta y otra app pide abrir una carpeta (launchMode = singleTop).
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        if (intent.getBooleanExtra(Atajos.EXTRA_RECIENTES, false)) {
+            abrirRecientes()
+            return
+        }
         val ruta = rutaDesdeIntent(intent) ?: return
         supportFragmentManager.beginTransaction()
             .replace(R.id.contenedorPantallas, crearPantalla(ruta))
