@@ -16,6 +16,7 @@ object Atajos {
 
     const val EXTRA_RECIENTES = "atajo_recientes"
 
+    const val EXTRA_FAVORITOS = "atajo_favoritos"
     /** Descargas y Recientes: no cambian, se registran al abrir la app. */
     fun registrarBase(ctx: Context) {
         try {
@@ -23,11 +24,15 @@ object Atajos {
             val descargas = Intent(app, MainActivity::class.java)
                 .setAction(Intent.ACTION_VIEW)
                 .setData(Uri.fromFile(Almacenamientos.descargas()))
-            val recientes = Intent(app, MainActivity::class.java)
+            val recientes = Intent(app, MainActivity::class.java)            val favoritos = Intent(app, MainActivity::class.java)
+                .setAction(Intent.ACTION_MAIN)
+                .putExtra(EXTRA_FAVORITOS, true)
+
                 .setAction(Intent.ACTION_MAIN)
                 .putExtra(EXTRA_RECIENTES, true)
             ShortcutManagerCompat.pushDynamicShortcut(app, atajo(app, "descargas", "Descargas", null, R.drawable.ic_atajo_carpeta, descargas, 1))
-            ShortcutManagerCompat.pushDynamicShortcut(app, atajo(app, "recientes", "Recientes", null, R.drawable.ic_atajo_reciente, recientes, 2))
+            ShortcutManagerCompat.pushDynamicShortcut(app, atajo(app, "recientes", "Recientes", null, R.drawable.ic_atajo_reciente, recientes, 2))            ShortcutManagerCompat.pushDynamicShortcut(app, atajo(app, "favoritos", "Favoritos", null, R.drawable.ic_atajo_carpeta, favoritos, 3))
+
         } catch (_: Exception) { }
     }
 
