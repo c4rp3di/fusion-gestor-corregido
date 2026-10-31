@@ -64,6 +64,9 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Si el permiso se acaba de conceder, el selector del sistema debe refrescar nuestras raíces
-        if (Permisos.tiene(this)) ProveedorDocumentos.avisarCambioRaices(this)
+        if (Permisos.tiene(this)) {
+            ProveedorDocumentos.avisarCambioRaices(this)
+            PermisoArchivosUi.ofrecerBarraInferior(this)
+        }
     }
 }
