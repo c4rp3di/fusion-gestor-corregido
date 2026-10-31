@@ -105,7 +105,11 @@ class PantallaGestor : Fragment() {
     private var popupFavoritos: PopupWindow? = null
 
     private val solicitud: SolicitudExterna? get() = (activity as? AnfitrionExterno)?.solicitud
-    private val enModoExterno: Boolean get() = solicitud != null
+    /** Hay una petición externa (guardar/elegir…). En modo «Abrir» la pantalla funciona como el gestor normal. */
+    private val enModoExterno: Boolean get() = solicitud?.let { it.tipo != SolicitudExterna.Tipo.ABRIR } == true
+
+    /** Cualquier petición externa, incluida «Abrir»: no debe pisar la última carpeta ni el orden de la app. */
+    private val vieneDeOtraApp: Boolean get() = solicitud != null
     private fun anfitrion(): AnfitrionExterno? = activity as? AnfitrionExterno
 
     private var filtro = Filtro.TODOS
@@ -459,7 +463,7 @@ class PantallaGestor : Fragment() {
             construirRuta()
             aplicarFiltro()
             // Los modos externos no deben cambiar la carpeta con la que se abre la app normalmente
-            if (!enModoExterno) repositorio.guardarUltimaCarpeta(carpeta)
+            if (!vieneDeOtraApp) repositorio.guardarUltimaCarpeta(carpeta)
             actualizarBarraModo()
             abrirPendiente()
         }
@@ -553,7 +557,7 @@ class PantallaGestor : Fragment() {
 
     private fun ordenar(items: List<ArchivoItem>): List<ArchivoItem> {
         // En los modos externos, hasta que el usuario elija otro orden: lo más reciente primero
-        val porDefectoExterno = enModoExterno && !ordenElegidoEnSesion
+        val porDefectoExterno = vieneDeOtraApp && !ordenElegidoEnSesion
         val orden = if (porDefectoExterno) ORDEN_FECHA else ajustes.orden
         val ascendente = if (porDefectoExterno) false else ajustes.ordenAscendente
         val comparador: Comparator<ArchivoItem> = when (orden) {
