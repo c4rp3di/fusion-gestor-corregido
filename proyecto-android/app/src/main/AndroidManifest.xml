@@ -118,6 +118,15 @@
             </intent-filter>
         </activity>
 
+        <!-- Atajo «Favoritos»: ventana flotante con la lista, sin abrir la app completa -->
+        <activity
+            android:name=".ActividadFavoritos"
+            android:exported="false"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/Theme.MiApp.Transparente" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
