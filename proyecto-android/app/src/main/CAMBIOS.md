@@ -58,3 +58,9 @@ Este código no se pudo compilar en el entorno donde se escribió (sin SDK de An
 
 ## Corrección (v3e)
 - Al abrir un archivo desde la barra/notificación «Guardado · ABRIR» (o «Abrir con…»), la pantalla se mostraba en modo externo y ocultaba la barra de selección y los menús contextuales (⋮, copiar, mover, borrar…). Ahora el modo «Abrir» se comporta como el gestor normal; solo no pisa la última carpeta ni el orden de la app.
+
+## Deshacer y atajos (v3f)
+- **Deshacer**: tras borrar a la papelera o tras mover (cortar/pegar) aparece una barra «DESHACER» durante 8 s. Borrar a la papelera → restaura; mover → devuelve los elementos a su carpeta de origen (si allí ya hay uno con el mismo nombre se añade «(1)»). Copiar y borrado definitivo no tienen deshacer.
+- **Atajos del icono** (pulsación larga): «Última descarga» (se actualiza al guardar algo desde otra app), «Descargas» y «Recientes».
+- Nuevos: `data/Atajos.kt`, `res/drawable/ic_atajo_carpeta.xml`, `ic_atajo_reciente.xml`, `ic_atajo_archivo.xml`.
+- Modificados: `data/Papelera.kt` (`enviarConEntrada`), `ui/Utilidades.kt` (`avisoConDeshacer`), `ui/PantallaGestor.kt`, `MainActivity.kt`, `data/AvisoDescarga.kt`.
